@@ -66,8 +66,24 @@ while True:
                   shape[drawing_point][0]:(shape[drawing_point][0] + tongueHeight)] = overlay
 
         # draw the nose of the filter
-        noseHeight = int(calc_euclid_distance(shape[49], shape[55]))
-        noseWidth = int(calc_euclid_distance(shape[49], shape[55]))
+        # noseHeight = int(calc_euclid_distance(shape[30], shape[33]))
+        # noseWidth = int(calc_euclid_distance(shape[31], shape[35]))
+        noseHeight, noseWidth, _ = nose_img.shape
+        noseHeight = int(calc_euclid_distance(shape[31], shape[35]) * 2.5)
+        noseWidth = noseHeight
+        angle = int(atan((shape[31][1] - shape[35][1]) / (shape[35][0] - shape[31][0])) * 180 / pi)
+        rot_nose_img = rotateImage(nose_img, angle)
+        r_nose_img = cv2.resize(rot_nose_img, (noseWidth, noseHeight), interpolation=cv2.INTER_AREA)
+        nose_image_center = tuple(np.array(r_nose_img.shape[1::-1]) / 2)
+        drawing_point = 30
+        nose_drawing_point = [int(shape[drawing_point][0] - nose_image_center[0]),
+                              int(shape[drawing_point][1] - nose_image_center[1])]
+
+        overlay = cv2.addWeighted(image[nose_drawing_point[1]:(nose_drawing_point[1] + noseHeight),
+                                  nose_drawing_point[0]:(nose_drawing_point[0] + noseWidth)], 1,
+                                  r_nose_img, 1, 0)
+        image[nose_drawing_point[1]:(nose_drawing_point[1] + noseHeight),
+              nose_drawing_point[0]:(nose_drawing_point[0] + noseWidth)] = overlay
 
         # loop over the (x, y)-coordinates for the facial landmarks
         # and draw them on the image
